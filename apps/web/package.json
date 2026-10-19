@@ -7,11 +7,17 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "video:preview": "remotion preview src/video/index.ts",
+    "video:render": "remotion render src/video/index.ts SignalHarborAd out/signalharbor_ad.mp4"
   },
   "dependencies": {
+    "@remotion/player": "^4.0.536",
+    "@types/three": "^0.186.0",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "remotion": "^4.0.536",
+    "three": "^0.186.1"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",

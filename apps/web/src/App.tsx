@@ -38,6 +38,7 @@ import { RelationshipGraph } from "./components/RelationshipGraph";
 import { CountUp } from "./components/CountUp";
 import { ConfidenceRing } from "./components/ConfidenceRing";
 import { TiltCard } from "./components/TiltCard";
+import { AdCinemaModal } from "./components/AdCinemaModal";
 
 type ViewTab =
   | "overview"
@@ -306,6 +307,7 @@ export function App() {
 
   // Modal: Schedule Run
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [showAdModal, setShowAdModal] = useState(false);
 
   // Global Keyboard Shortcuts
   useEffect(() => {
@@ -682,6 +684,27 @@ STATUS: ${entity.disposition.toUpperCase()}`;
             >
               ⌘K
             </kbd>
+          </button>
+
+          <button
+            onClick={() => setShowAdModal(true)}
+            className="btn-secondary"
+            style={{
+              height: "32px",
+              fontSize: "11px",
+              padding: "5px 12px",
+              border: "1px solid rgba(0, 240, 255, 0.45)",
+              background: "rgba(0, 240, 255, 0.08)",
+              color: "#00F0FF",
+              boxShadow: "0 0 15px rgba(0, 240, 255, 0.18)",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              fontWeight: 700,
+            }}
+          >
+            <span style={{ fontSize: "13px" }}>🎬</span>
+            <span>Watch 3D Film</span>
           </button>
 
           <button
@@ -3289,6 +3312,8 @@ STATUS: ${entity.disposition.toUpperCase()}`;
           </div>
         </div>
       )}
+      {/* ================= REMOTION 3D AD CINEMA MODAL ================= */}
+      <AdCinemaModal isOpen={showAdModal} onClose={() => setShowAdModal(false)} />
     </div>
   );
 }
