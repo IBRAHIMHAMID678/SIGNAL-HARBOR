@@ -100,6 +100,30 @@ export const AdCinemaModal: React.FC<AdCinemaModalProps> = ({
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <a
+              href="/signalharbor_ad.mp4"
+              download="signalharbor_ad.mp4"
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                padding: "8px 14px",
+                borderRadius: 10,
+                backgroundColor: "rgba(0, 240, 255, 0.15)",
+                border: "1px solid rgba(0, 240, 255, 0.4)",
+                color: "#00F0FF",
+                fontSize: 12,
+                fontWeight: 700,
+                cursor: "pointer",
+                fontFamily: "monospace",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                textDecoration: "none",
+                boxShadow: "0 0 15px rgba(0, 240, 255, 0.2)",
+              }}
+            >
+              ⬇ Download MP4 (38.9MB)
+            </a>
             <button
               onClick={copyCommand}
               style={{
@@ -165,6 +189,7 @@ export const AdCinemaModal: React.FC<AdCinemaModalProps> = ({
             controls
             autoPlay
             loop
+            acknowledgeRemotionLicense
           />
         </div>
 

@@ -5,12 +5,13 @@ import { Scene2SpatialHarvest } from "./scenes/Scene2SpatialHarvest";
 import { Scene3EvidenceEngine } from "./scenes/Scene3EvidenceEngine";
 import { Scene4RelationshipGraph } from "./scenes/Scene4RelationshipGraph";
 import { Scene5ClimaxOutro } from "./scenes/Scene5ClimaxOutro";
+import { CinematicOverlay } from "./components/CinematicOverlay";
 
 export const SignalHarborAd: React.FC = () => {
   return (
     <AbsoluteFill
       style={{
-        backgroundColor: "#050608",
+        backgroundColor: "#030408",
         fontFamily:
           '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Outfit", sans-serif',
       }}
@@ -39,6 +40,9 @@ export const SignalHarborAd: React.FC = () => {
       <Sequence from={750} durationInFrames={150}>
         <Scene5ClimaxOutro />
       </Sequence>
+
+      {/* Persistent Cinematic Mission HUD & Anamorphic Letterbox Overlays */}
+      <CinematicOverlay />
     </AbsoluteFill>
   );
 };

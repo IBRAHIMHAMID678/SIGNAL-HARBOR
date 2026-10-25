@@ -5,43 +5,56 @@ import {
   spring,
   interpolate,
 } from "remotion";
-import { KineticTitle } from "../components/KineticTitle";
 
 export const Scene1Crisis: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // 3D Camera forward push & tilt
-  const cameraZ = interpolate(frame, [0, 150], [0, 300], {
+  // Camera 3D forward dolly & impact shake
+  const cameraZ = interpolate(frame, [0, 40, 160], [-80, 0, 180], {
     extrapolateRight: "clamp",
   });
-  const cameraRotateX = interpolate(frame, [0, 80, 150], [15, 6, 0]);
-  const cameraRotateY = interpolate(frame, [0, 150], [-8, 6]);
+  const cameraPitch = interpolate(frame, [0, 30, 160], [12, 4, -2]);
 
-  // Flash glitch on start
-  const glitchOpacity = frame < 8 ? (frame % 2 === 0 ? 0.35 : 0.85) : 0;
+  // Impact screen shake on title drop (frames 15-30)
+  const shakeIntensity = interpolate(frame, [14, 18, 32], [0, 8, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const shakeX = Math.sin(frame * 45) * shakeIntensity;
+  const shakeY = Math.cos(frame * 35) * shakeIntensity;
 
-  // Floating Warning Card 1 entrance
+  // Staggered Title Animations
+  const title1Spring = spring({
+    frame: frame - 6,
+    fps,
+    config: { damping: 10, mass: 0.6, stiffness: 180 },
+  });
+  const title2Spring = spring({
+    frame: frame - 18,
+    fps,
+    config: { damping: 9, mass: 0.5, stiffness: 220 },
+  });
+
+  // Staggered Hazard Cards
   const card1Progress = spring({
-    frame: frame - 10,
+    frame: frame - 38,
     fps,
-    config: { damping: 14, mass: 0.8, stiffness: 120 },
+    config: { damping: 12, mass: 0.7, stiffness: 140 },
   });
-  // Floating Warning Card 2 entrance
   const card2Progress = spring({
-    frame: frame - 25,
+    frame: frame - 52,
     fps,
-    config: { damping: 14, mass: 0.8, stiffness: 120 },
+    config: { damping: 12, mass: 0.7, stiffness: 140 },
   });
-  // Floating Warning Card 3 entrance
   const card3Progress = spring({
-    frame: frame - 40,
+    frame: frame - 66,
     fps,
-    config: { damping: 14, mass: 0.8, stiffness: 120 },
+    config: { damping: 12, mass: 0.7, stiffness: 140 },
   });
 
-  // Scene fade out at end
-  const sceneOpacity = interpolate(frame, [135, 155], [1, 0], {
+  // Scene exit fade
+  const sceneOpacity = interpolate(frame, [142, 160], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -51,244 +64,381 @@ export const Scene1Crisis: React.FC = () => {
       style={{
         position: "absolute",
         inset: 0,
-        backgroundColor: "#050608",
+        backgroundColor: "#030407",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        perspective: 1000,
+        perspective: 1100,
         opacity: sceneOpacity,
+        transform: `translate(${shakeX}px, ${shakeY}px)`,
       }}
     >
-      {/* Background radial gradient mesh */}
+      {/* Background Volumetric Hazard Nebula */}
       <div
         style={{
           position: "absolute",
-          width: 1400,
-          height: 1400,
+          width: 1300,
+          height: 1300,
           borderRadius: "50%",
           background:
-            "radial-gradient(circle, rgba(239,68,68,0.18) 0%, rgba(220,38,38,0.05) 45%, transparent 70%)",
-          filter: "blur(80px)",
-          transform: `scale(${1 + Math.sin(frame * 0.08) * 0.1})`,
+            "radial-gradient(circle, rgba(255, 0, 85, 0.22) 0%, rgba(255, 77, 0, 0.08) 40%, transparent 70%)",
+          filter: "blur(90px)",
+          transform: `scale(${1 + Math.sin(frame * 0.1) * 0.08})`,
         }}
       />
 
-      {/* Cyberpunk Grid floor */}
+      {/* 3D Cyberpunk Horizon Grid */}
       <div
         style={{
           position: "absolute",
-          bottom: -200,
-          width: "200%",
-          height: 800,
+          bottom: -160,
+          width: "250%",
+          height: 700,
           background:
-            "linear-gradient(to top, rgba(239,68,68,0.08) 1px, transparent 1px), linear-gradient(to right, rgba(239,68,68,0.08) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-          transform: "rotateX(75deg)",
+            "linear-gradient(to top, rgba(255, 0, 85, 0.18) 1px, transparent 1px), linear-gradient(to right, rgba(255, 0, 85, 0.18) 1px, transparent 1px)",
+          backgroundSize: "64px 64px",
+          transform: "rotateX(78deg)",
           transformOrigin: "bottom center",
-          opacity: 0.6,
+          opacity: 0.5,
+          maskImage: "linear-gradient(to top, black 30%, transparent 95%)",
+          WebkitMaskImage: "linear-gradient(to top, black 30%, transparent 95%)",
         }}
       />
 
-      {/* Camera 3D Stage container */}
+      {/* Floating Warning Ticker Ribbon (Tilted Across Background) */}
+      <div
+        style={{
+          position: "absolute",
+          top: "30%",
+          width: "120%",
+          transform: "rotate(-3deg) translateY(-50%)",
+          backgroundColor: "rgba(255, 0, 85, 0.12)",
+          borderTop: "1px solid rgba(255, 0, 85, 0.3)",
+          borderBottom: "1px solid rgba(255, 0, 85, 0.3)",
+          padding: "8px 0",
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+          opacity: 0.45,
+          display: "flex",
+          gap: 32,
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "monospace",
+            fontSize: 14,
+            fontWeight: 800,
+            color: "#FF3366",
+            letterSpacing: "0.25em",
+            transform: `translateX(-${(frame * 3) % 400}px)`,
+          }}
+        >
+          /// CRITICAL OUTBOUND DEGRADATION DETECTED /// DOMAIN BURN ACCELERATING /// 94.2% SCRAPED EMAILS EXPIRED /// SPAM TRAP TRIPPED ///
+        </div>
+      </div>
+
+      {/* Main 3D Stage Container */}
       <div
         style={{
           position: "relative",
-          width: "100%",
-          height: "100%",
+          zIndex: 10,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
+          transform: `translateZ(${cameraZ}px) rotateX(${cameraPitch}deg)`,
           transformStyle: "preserve-3d",
-          transform: `translateZ(${cameraZ}px) rotateX(${cameraRotateX}deg) rotateY(${cameraRotateY}deg)`,
+          width: 1400,
         }}
       >
-        {/* Eyebrow alert pill */}
+        {/* Tactical Status Pill */}
         <div
           style={{
-            transform: "translateZ(80px)",
-            marginBottom: 28,
-            padding: "8px 20px",
-            borderRadius: 9999,
-            backgroundColor: "rgba(239, 68, 68, 0.15)",
-            border: "1px solid rgba(239, 68, 68, 0.4)",
-            color: "#EF4444",
-            fontSize: 16,
-            fontWeight: 700,
-            letterSpacing: "0.2em",
-            textTransform: "uppercase",
-            display: "flex",
+            display: "inline-flex",
             alignItems: "center",
             gap: 10,
-            boxShadow: "0 0 30px rgba(239, 68, 68, 0.3)",
+            padding: "8px 18px",
+            borderRadius: 100,
+            backgroundColor: "rgba(255, 0, 85, 0.15)",
+            border: "1px solid rgba(255, 0, 85, 0.5)",
+            boxShadow: "0 0 30px rgba(255, 0, 85, 0.3)",
+            marginBottom: 24,
+            transform: `scale(${interpolate(title1Spring, [0, 1], [0.7, 1])})`,
+            opacity: interpolate(title1Spring, [0, 1], [0, 1]),
           }}
         >
-          <span
+          <div
             style={{
               width: 8,
               height: 8,
               borderRadius: "50%",
-              backgroundColor: "#EF4444",
-              boxShadow: "0 0 12px #EF4444",
-              display: "inline-block",
+              backgroundColor: "#FF0055",
+              boxShadow: "0 0 10px #FF0055",
             }}
           />
-          CRITICAL DATA DEGRADATION DETECTED
+          <span
+            style={{
+              fontFamily: "monospace",
+              fontSize: 13,
+              fontWeight: 800,
+              color: "#FFA3B8",
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+            }}
+          >
+            HAZARD PROTOCOL // B2B BLINDSPOT ACTIVE
+          </span>
         </div>
 
         {/* Massive Kinetic Typography */}
-        <div style={{ transform: "translateZ(120px)", zIndex: 10 }}>
-          <KineticTitle
-            words={["Your", "SDRs", "Aren't", "Booking", "Meetings."]}
-            startFrame={10}
-            highlightIndices={[1, 4]}
-            highlightColor="#EF4444"
-            fontSize={64}
-          />
-          <div style={{ height: 16 }} />
-          <KineticTitle
-            words={["They're", "Paying", "To", "Train", "Spam", "Filters."]}
-            startFrame={35}
-            highlightIndices={[4, 5]}
-            highlightColor="#F87171"
-            fontSize={54}
-          />
-        </div>
-
-        {/* 3D Floating Error Cards */}
-        {/* Card 1: Domain Blacklist */}
-        <div
-          style={{
-            position: "absolute",
-            left: "8%",
-            top: "22%",
-            width: 380,
-            padding: 24,
-            borderRadius: 20,
-            background: "rgba(18, 9, 12, 0.75)",
-            backdropFilter: "blur(20px)",
-            border: "1px solid rgba(239, 68, 68, 0.35)",
-            boxShadow:
-              "0 20px 50px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.1), 0 0 40px rgba(239,68,68,0.2)",
-            transform: `translateZ(${interpolate(card1Progress, [0, 1], [-200, 60])}px) rotateY(18deg) rotateX(-8deg) scale(${card1Progress})`,
-            opacity: card1Progress,
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <span style={{ color: "#EF4444", fontSize: 13, fontWeight: 700, letterSpacing: "0.1em" }}>
-              SMTP FAILURE #550
-            </span>
-            <span style={{ fontSize: 12, color: "#9CA3AF", fontFamily: "monospace" }}>0.01s ago</span>
-          </div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: "#FFFFFF", marginBottom: 8 }}>
-            Recipient Mailbox Disabled
-          </div>
-          <div style={{ fontSize: 13, color: "#9CA3AF", fontFamily: "monospace", lineHeight: 1.5 }}>
-            user_id: <span style={{ color: "#FCA5A5" }}>alex.mercer@stale-corp.com</span>
-            <br />
-            MX lookup: <span style={{ color: "#EF4444" }}>NXDOMAIN</span>
-          </div>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          {/* Line 1 */}
           <div
             style={{
-              marginTop: 14,
-              padding: "6px 12px",
-              background: "rgba(239, 68, 68, 0.2)",
-              borderRadius: 8,
-              color: "#FCA5A5",
-              fontSize: 12,
-              fontWeight: 600,
-              display: "inline-block",
+              fontSize: 68,
+              fontWeight: 900,
+              letterSpacing: "-0.03em",
+              color: "#FFFFFF",
+              textTransform: "uppercase",
+              transform: `translateY(${interpolate(title1Spring, [0, 1], [40, 0])}px) scale(${interpolate(title1Spring, [0, 1], [0.9, 1])})`,
+              opacity: interpolate(title1Spring, [0, 1], [0, 1]),
+              filter: `blur(${interpolate(title1Spring, [0, 1], [10, 0])}px)`,
+              textShadow: "0 4px 30px rgba(0,0,0,0.8)",
             }}
           >
-            42.8% Outbound Bounce Rate
+            Your Outbound Machine Is
+          </div>
+
+          {/* Line 2 with Glitch RGB Split */}
+          <div
+            style={{
+              fontSize: 88,
+              fontWeight: 950,
+              letterSpacing: "-0.04em",
+              color: "#FF0055",
+              textTransform: "uppercase",
+              transform: `translateY(${interpolate(title2Spring, [0, 1], [50, 0])}px) scale(${interpolate(title2Spring, [0, 1], [0.85, 1])})`,
+              opacity: interpolate(title2Spring, [0, 1], [0, 1]),
+              filter: `blur(${interpolate(title2Spring, [0, 1], [14, 0])}px)`,
+              textShadow:
+                "0 0 40px rgba(255, 0, 85, 0.7), -3px 0 #00F0FF, 3px 0 #FF0055",
+            }}
+          >
+            FLYING BLIND.
           </div>
         </div>
 
-        {/* Card 2: Domain Reputation Tanking */}
+        {/* 3 Floating 3D Holographic Hazard Glass Cards */}
         <div
           style={{
-            position: "absolute",
-            right: "8%",
-            top: "28%",
-            width: 360,
-            padding: 24,
-            borderRadius: 20,
-            background: "rgba(18, 9, 12, 0.75)",
-            backdropFilter: "blur(20px)",
-            border: "1px solid rgba(239, 68, 68, 0.35)",
-            boxShadow:
-              "0 20px 50px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.1), 0 0 40px rgba(239,68,68,0.2)",
-            transform: `translateZ(${interpolate(card2Progress, [0, 1], [-250, 40])}px) rotateY(-22deg) rotateX(10deg) scale(${card2Progress})`,
-            opacity: card2Progress,
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-            <span style={{ color: "#EF4444", fontSize: 13, fontWeight: 700, letterSpacing: "0.1em" }}>
-              DOMAIN HEALTH
-            </span>
-            <span style={{ color: "#EF4444", fontSize: 14, fontWeight: 800 }}>ALERT</span>
-          </div>
-          <div style={{ fontSize: 36, fontWeight: 900, color: "#EF4444", fontFamily: "monospace", marginBottom: 6 }}>
-            24 / 100
-          </div>
-          <div style={{ fontSize: 13, color: "#F87171", lineHeight: 1.4 }}>
-            Spamhaus Listing Imminent. Secondary sending pools suspended.
-          </div>
-        </div>
-
-        {/* Card 3: Wasted SDR Hours */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: "10%",
-            width: 480,
-            padding: "16px 28px",
-            borderRadius: 16,
-            background: "rgba(10, 10, 15, 0.85)",
-            backdropFilter: "blur(20px)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            boxShadow: "0 20px 40px rgba(0,0,0,0.7)",
-            transform: `translateZ(${interpolate(card3Progress, [0, 1], [-100, 100])}px) scale(${card3Progress})`,
-            opacity: card3Progress,
             display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            gap: 28,
+            width: "100%",
+            maxWidth: 1280,
+            justifyContent: "center",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          {/* Card 1 */}
+          <div
+            style={{
+              flex: 1,
+              background:
+                "linear-gradient(135deg, rgba(255, 0, 85, 0.12) 0%, rgba(15, 7, 12, 0.85) 100%)",
+              border: "1px solid rgba(255, 0, 85, 0.4)",
+              borderRadius: 20,
+              padding: "28px 24px",
+              boxShadow:
+                "0 20px 50px rgba(0,0,0,0.8), 0 0 35px rgba(255, 0, 85, 0.15)",
+              backdropFilter: "blur(20px)",
+              transform: `translateY(${interpolate(card1Progress, [0, 1], [80, 0])}px) rotateY(${interpolate(card1Progress, [0, 1], [-15, -4])}deg) scale(${card1Progress})`,
+              opacity: card1Progress,
+            }}
+          >
             <div
               style={{
-                width: 12,
-                height: 12,
-                borderRadius: "50%",
-                backgroundColor: "#EF4444",
-                boxShadow: "0 0 14px #EF4444",
+                fontFamily: "monospace",
+                fontSize: 12,
+                fontWeight: 800,
+                color: "#FF3366",
+                letterSpacing: "0.15em",
+                marginBottom: 10,
               }}
-            />
-            <div style={{ fontSize: 15, color: "#D1D5DB", fontWeight: 600 }}>
-              Legacy Data Providers: <span style={{ color: "#FFFFFF" }}>$15,000 Contract</span>
+            >
+              [TRAP 01 // DELIVERABILITY]
+            </div>
+            <div
+              style={{
+                fontSize: 38,
+                fontWeight: 900,
+                color: "#FFFFFF",
+                marginBottom: 8,
+              }}
+            >
+              Domain Burned
+            </div>
+            <div
+              style={{
+                fontSize: 14,
+                color: "rgba(255, 255, 255, 0.65)",
+                lineHeight: 1.5,
+                marginBottom: 16,
+              }}
+            >
+              Sending cold sequences to unverified lists destroys your sender
+              reputation in days.
+            </div>
+            <div
+              style={{
+                fontFamily: "monospace",
+                fontSize: 22,
+                fontWeight: 800,
+                color: "#FF0055",
+                backgroundColor: "rgba(255, 0, 85, 0.12)",
+                padding: "8px 14px",
+                borderRadius: 8,
+                border: "1px solid rgba(255, 0, 85, 0.3)",
+                display: "inline-block",
+              }}
+            >
+              48.2% Bouncetrap Rate
             </div>
           </div>
-          <div style={{ fontSize: 14, color: "#EF4444", fontWeight: 700, fontFamily: "monospace" }}>
-            38% STALE LEADS
+
+          {/* Card 2 */}
+          <div
+            style={{
+              flex: 1,
+              background:
+                "linear-gradient(135deg, rgba(255, 102, 0, 0.12) 0%, rgba(15, 8, 5, 0.85) 100%)",
+              border: "1px solid rgba(255, 102, 0, 0.4)",
+              borderRadius: 20,
+              padding: "28px 24px",
+              boxShadow:
+                "0 20px 50px rgba(0,0,0,0.8), 0 0 35px rgba(255, 102, 0, 0.15)",
+              backdropFilter: "blur(20px)",
+              transform: `translateY(${interpolate(card2Progress, [0, 1], [80, 0])}px) scale(${card2Progress})`,
+              opacity: card2Progress,
+            }}
+          >
+            <div
+              style={{
+                fontFamily: "monospace",
+                fontSize: 12,
+                fontWeight: 800,
+                color: "#FF7700",
+                letterSpacing: "0.15em",
+                marginBottom: 10,
+              }}
+            >
+              [TRAP 02 // STALE DATA]
+            </div>
+            <div
+              style={{
+                fontSize: 38,
+                fontWeight: 900,
+                color: "#FFFFFF",
+                marginBottom: 8,
+              }}
+            >
+              Static Lists Lie
+            </div>
+            <div
+              style={{
+                fontSize: 14,
+                color: "rgba(255, 255, 255, 0.65)",
+                lineHeight: 1.5,
+                marginBottom: 16,
+              }}
+            >
+              ZoomInfo & Apollo contact databases are weeks stale. Prospects
+              have already moved on.
+            </div>
+            <div
+              style={{
+                fontFamily: "monospace",
+                fontSize: 22,
+                fontWeight: 800,
+                color: "#FF7700",
+                backgroundColor: "rgba(255, 102, 0, 0.12)",
+                padding: "8px 14px",
+                borderRadius: 8,
+                border: "1px solid rgba(255, 102, 0, 0.3)",
+                display: "inline-block",
+              }}
+            >
+              -$2.4M Lost Pipeline
+            </div>
+          </div>
+
+          {/* Card 3 */}
+          <div
+            style={{
+              flex: 1,
+              background:
+                "linear-gradient(135deg, rgba(255, 0, 85, 0.12) 0%, rgba(15, 7, 12, 0.85) 100%)",
+              border: "1px solid rgba(255, 0, 85, 0.4)",
+              borderRadius: 20,
+              padding: "28px 24px",
+              boxShadow:
+                "0 20px 50px rgba(0,0,0,0.8), 0 0 35px rgba(255, 0, 85, 0.15)",
+              backdropFilter: "blur(20px)",
+              transform: `translateY(${interpolate(card3Progress, [0, 1], [80, 0])}px) rotateY(${interpolate(card3Progress, [0, 1], [15, 4])}deg) scale(${card3Progress})`,
+              opacity: card3Progress,
+            }}
+          >
+            <div
+              style={{
+                fontFamily: "monospace",
+                fontSize: 12,
+                fontWeight: 800,
+                color: "#FF3366",
+                letterSpacing: "0.15em",
+                marginBottom: 10,
+              }}
+            >
+              [TRAP 03 // HALLUCINATIONS]
+            </div>
+            <div
+              style={{
+                fontSize: 38,
+                fontWeight: 900,
+                color: "#FFFFFF",
+                marginBottom: 8,
+              }}
+            >
+              Zero Evidence
+            </div>
+            <div
+              style={{
+                fontSize: 14,
+                color: "rgba(255, 255, 255, 0.65)",
+                lineHeight: 1.5,
+                marginBottom: 16,
+              }}
+            >
+              AI scraping engines guess email patterns and fabricate titles. Zero
+              provable proof.
+            </div>
+            <div
+              style={{
+                fontFamily: "monospace",
+                fontSize: 22,
+                fontWeight: 800,
+                color: "#FF0055",
+                backgroundColor: "rgba(255, 0, 85, 0.12)",
+                padding: "8px 14px",
+                borderRadius: 8,
+                border: "1px solid rgba(255, 0, 85, 0.3)",
+                display: "inline-block",
+              }}
+            >
+              0.4% Reply Conversion
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Glitch Overlay */}
-      {glitchOpacity > 0 && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundColor: "rgba(239, 68, 68, 0.15)",
-            mixBlendMode: "overlay",
-            pointerEvents: "none",
-          }}
-        />
-      )}
     </div>
   );
 };
