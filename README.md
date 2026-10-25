@@ -6,13 +6,13 @@
 
 <p align="center">
   <a href="apps/web/public/signalharbor_ad.mp4">
-    <img src="docs/assets/video_preview.png" alt="SignalHarbor 3D Motion Commercial" width="100%" style="border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);" />
+    <img src="docs/assets/signalharbor_ad.gif" alt="SignalHarbor 3D Motion Commercial" width="100%" style="border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);" />
   </a>
 </p>
 
 <p align="center">
   <a href="apps/web/public/signalharbor_ad.mp4">
-    <strong>▶ Watch Full HD Commercial (MP4 • 1080p @ 30 FPS)</strong>
+    <strong>▶ Watch Full HD 1080p Commercial (MP4 • 30 FPS)</strong>
   </a>
 </p>
 
